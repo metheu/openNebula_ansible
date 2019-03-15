@@ -1,0 +1,12 @@
+---
+# handlers file for open-Nebula
+-   name: yum_update_cache
+    yum:
+        update_cache: yes
+        
+
+-   name: install ruby 2.2.2 
+    yum:
+        name: rh-ruby23
+        state: present
+-

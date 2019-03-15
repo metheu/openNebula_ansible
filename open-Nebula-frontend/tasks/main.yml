@@ -1,0 +1,141 @@
+---
+# tasks file for open-Nebula
+-   name: Copy OpenNebula repo config to /etc/yum.repos.d/
+    become: yes
+    template:
+        src: templates/opennebula.repo.j2
+        dest: /etc/yum.repos.d/opennebula.repo
+
+-   name: Add epel-release repository
+    become: yes
+    yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    notify: yum_update_cache
+    
+
+-   name: Install OpenNebula packages
+    become: yes
+    yum:
+        name: "{{ packages }}"
+        state: present
+        disable_gpg_check: yes
+    vars:
+        packages:
+            - opennebula-server 
+            - opennebula-sunstone 
+            - opennebula-ruby 
+            - opennebula-gate 
+            - opennebula-flow
+            - redhat-lsb
+    register: one_pacakges_installed
+
+-   name: Install bundler version < 2
+    become: yes
+    shell: gem install bundler --version '< 2'
+    when: one_pacakges_installed
+    register: gem_bundler_ver_2_installed
+
+-   name: Execute the One script to install gems
+    become: yes
+    shell: yes | /usr/share/one/install_gems
+    when: gem_bundler_ver_2_installed
+
+# -   name: Install bundler for less than 2.0
+#     gem:
+#         name: bundler
+#         state: present
+#         version: < 2.0
+#     when: one_pacakges_installed
+#     register: gem_bundler_2_installed
+
+# -   name: Execute the One script to install gems
+#     become: yes
+#     shell: yes | /usr/share/one/install_gems
+#     when: gem_bundler_2_installed
+
+
+# -   name: Remove 2.0.0 ruby
+#     become: yes
+#     yum:
+#         name: ruby
+#         state: absent
+#     register: removal_ruby_v2
+
+# -   name: Install redhat-lsb for install gems script to function non interactively
+#     become:
+#     yum:
+#         name: redhat-lsb
+#         state: present
+#     register: lsb_release installed
+
+# -   name: Add Open Nebula repo
+#     become: yes
+#     yum_repository:
+#         name: opennebula
+#         description: Open nebula repo
+#         file: openNebula
+#         baseurl: https://downloads.opennebula.org/repo/5.4/CentOS/7/x86_64
+#         enabled: yes
+#         gpgcheck: no
+#         gpgkey: https://downloads.opennebula.org/repo/repo.key
+#     notify:
+#       - update packages
+
+
+# -   name: Add repository
+#     become: yes  
+#     yum_repository:
+#         name: epel
+#         description: EPEL YUM repo
+#         baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+#     notify:
+#       - update packages
+
+# -   name: Install development tools to be able to build ruby from source
+#     become: yes
+#     yum:
+#         name: "{{ build_tools_packages }}"
+#         state: present
+
+# -   name: Install One packages
+#     become: yes
+#     yum:
+#         name: "{{ one_packages }}"
+#         disable_gpg_check: yes
+#         state: present
+
+# -   name: Download ruby tar
+#     get_url:
+#         url: "{{ ruby_tar_link }}"
+#         dest: "/tmp/ruby-{{ ruby_version }}.tar.gz"
+#     when: removal_ruby_v2
+#     register: download_ruby_tar
+
+# -   name:
+#     unarchive:
+#         src: "/tmp/ruby-{{ ruby_version }}.tar.gz"
+#         dest: /tmp/
+#         remote_src: yes
+#     register: ruby_source_unpacked
+
+# -   name: Let's start the build process by running .configure with prefix DIR 
+#     command: "./configure --prefix=/bin/"
+#     args:
+#         chdir: "/tmp/ruby-{{ ruby_version }}"
+#     when: ruby_source_unpacked
+#     register: ruby_source_configure
+
+# -   name: Run make and make install
+#     become: yes 
+#     shell: make && make install
+#     args:
+#         chdir: "/tmp/ruby-{{ ruby_version }}"
+#     when: ruby_source_configure
+
+# -   name: Execute the One script to install gems
+#     become: yes
+#     shell: yes | /home/vagrant/.rvm/rubies/ruby-2.4.5/bin/ruby /usr/share/one/install_gems
+#     when: lsb_release installed
+  

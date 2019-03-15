@@ -1,0 +1,4 @@
+---
+# defaults file for open-Nebula
+ruby_tar_link: https://cache.ruby-lang.org/pub/ruby/2.4/ruby-2.4.5.tar.gz
+ruby_version: 2.4.5
