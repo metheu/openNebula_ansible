@@ -41,6 +41,26 @@
     become: yes
     shell: yes | /usr/share/one/install_gems
     when: gem_bundler_ver_2_installed
+    register: one_gems_installed
+
+-   name: OpenNebula and OpenNebula-sunstone started and enabled
+    become: yes
+    systemd:
+        name: opennebula
+        state: started
+        enabled: yes
+    when: one_gems_installed
+
+-   name: OpenNebula-sunstone started and enabled
+    become: yes
+    systemd:
+        name: opennebula-sunstone
+        state: started
+        enabled: yes
+    when: one_gems_installed
+
+
+
 
 # -   name: Install bundler for less than 2.0
 #     gem:
