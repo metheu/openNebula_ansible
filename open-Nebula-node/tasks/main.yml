@@ -1,0 +1,15 @@
+---
+# tasks file for open-Nebula-node
+-   name: Copy OpenNebula repo config to /etc/yum.repos.d/
+    become: yes
+    template:
+        src: templates/opennebula.repo.j2
+        dest: /etc/yum.repos.d/opennebula.repo
+    register: opennebula_repo_added
+
+-   name: Install opennebula-node-kvm
+    become: yes
+    yum:
+      name: opennebula-node-kvm
+      state: installed
+    when: opennebula_repo_added
