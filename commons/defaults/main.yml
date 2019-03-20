@@ -1,0 +1,5 @@
+---
+# defaults file for commons
+cm_user: ansy
+# python -c 'import crypt; print crypt.crypt("password", "5206b8b8a996")'
+cm_password: 52lMw8K6okfFg

@@ -1,0 +1,33 @@
+---
+# tasks file for commons
+-   name: Update system
+    become: yes
+    yum:
+      update_cache: yes
+      update_only: yes
+
+-   name: Create ansible  user for autmated CM 
+    become: yes
+    user:
+      name: "{{ cm_user }}"
+      password: "{{ cm_password }}"
+      append: yes
+      groups: wheel
+    register: ansible_user_created
+
+-   name: Start firewalld service
+    become: yes
+    systemd:
+      name: firewalld
+      state: started
+      enabled: yes
+    register: firewalld_service
+
+-   name: Start 8081 port for OpenNebula
+    become: yes
+    firewalld:
+      zone: public
+      port: 8081/tcp
+      permanent: yes
+      state: enabled
+    when: firewalld_service
